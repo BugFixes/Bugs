@@ -5,5 +5,24 @@
   "main": "index.js",
   "repository": "git@github.com:BugFixes/Bugs.git",
   "author": "Keloran <keloran@bugfix.es>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "test": "yarn standardTest && yarn mochaTest",
+    "standardTest": "standard ./**/*.js",
+    "mochaTest": "mocha test/**/*.js",
+    "docker": "yarn test && yarn start"
+  },
+  "dependencies": {
+    "bugfixes": "^1.3.0",
+    "elasticsearch": "^14.1.0",
+    "express": "^4.16.2",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.18.2",
+    "mocha": "^5.0.3",
+    "standard": "^11.0.0"
+  }
 }

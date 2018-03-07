@@ -1,0 +1,9 @@
+{
+  "name": "bugs",
+  "version": "0.0.1",
+  "description": "Bug Storage",
+  "main": "index.js",
+  "repository": "git@github.com:BugFixes/Bugs.git",
+  "author": "Keloran <keloran@bugfix.es>",
+  "license": "MIT"
+}

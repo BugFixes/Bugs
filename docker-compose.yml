@@ -1,26 +1,33 @@
 version: '3'
 services:
   kibana:
-    image: kibana
+    image: docker.elastic.co/kibana/kibana:6.0.1
     ports:
       - 5601:5601
     links:
       - elasticsearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.0.1
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+      - 9300:9300
   node:
     image: node:9
     working_dir: /home/node/app
     environment:
-      - PORT=${PORT}
-      - HOST=${HOST}
       - ELASTIC_HOST=${ELASTIC_HOST}
       - AWS_KEY=${AWS_KEY}
       - AWS_SECRET=${AWS_SECRET}
+      - BUGS_KEY=${BUGS_KEY}
+      - BUGS_SECRET=${BUGS_SECRET}
+      - TEST_ACCOUNT_ID=${TEST_ACCOUNT_ID}
+      - TEST_APPLICATION_ID=${TEST_APPLICATION_ID}
     links:
       - elasticsearch
     ports:
-      - 83:80
+      - 83:3000
     volumes:
       - ./:/home/node/app
     command: 'yarn docker'

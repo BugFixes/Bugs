@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global describe, it, afterEach */
 'use strict'
 
 require('dotenv').config()
@@ -13,9 +13,13 @@ const DataLayer = require('../src/models/datalayer')
 chai.use(chaiHttp)
 
 describe('EndPoints', () => {
-  beforeEach((done) => {
+  afterEach((done) => {
     const data = new DataLayer()
-    data.removeAll()
+    data.removeAll((error, result) => {
+      if (error) {
+        BugFixes.error(error)
+      }
+    })
 
     done()
   })
@@ -38,11 +42,30 @@ describe('EndPoints', () => {
     })
   })
 
+  describe('NonBreaking Random', () => {
+    it('shouldnt crash if random address given', (done) => {
+      chai.request(server)
+        .get('/' + Date.now())
+        .end((err, res) => {
+          if (err) {
+            BugFixes.error(err)
+
+            done(Error(err))
+          }
+
+          done()
+        })
+    })
+  })
+
   describe('/POST bug', () => {
     it('it should insert a bug', (done) => {
+      let insertDate = new Date()
+      insertDate = insertDate.toISOString()
+
       const payLoad = {
         logLevel: BugFixes.LOG,
-        payLoad: 'Test Data',
+        payLoad: 'Test Data-' + insertDate,
         accountId: process.env.TEST_ACCOUNT_ID,
         applicationId: process.env.TEST_APPLICATION_ID
       }
@@ -52,25 +75,46 @@ describe('EndPoints', () => {
         .set('X-API-KEY', process.env.BUGS_KEY)
         .set('X-API-SECRET', process.env.BUGS_SECRET)
         .send(payLoad)
-        // .end((err, res) => {
-        //   if (err) {
-        //     BugFixes.error(err)
+        .end((err, res) => {
+          if (err) {
+            BugFixes.error(err)
 
-        //     done(Error(err))
-        //   }
+            done(Error(err))
+          }
 
-        //   res.should.have.status(200)
-        //   done()
-        // })
-
-      done()
+          res.should.have.status(200)
+          done()
+        })
     })
   })
 
   describe('/GET bug', () => {
-    it('it should return all bugs', (done) => {
+    it('it should return all bugs for account', (done) => {
       chai.request(server)
-        .get('/v1/bug')
+        .get('/v1/bugs/' + process.env.TEST_ACCOUNT_ID)
+        .set('X-API-KEY', process.env.BUGS_KEY)
+        .set('X-API-SECRET', process.env.BUGS_SECRET)
+        .end((err, res) => {
+          if (err) {
+            BugFixes.error(err)
+
+            done(Error(err))
+          }
+
+          BugFixes.info(res.body)
+
+          res.should.have.status(200)
+          res.body.should.be.an('array')
+
+          done()
+        })
+    })
+
+    it('it should return all bugs for an application', (done) => {
+      chai.request(server)
+        .get('/v1/bugs/' + process.env.TEST_ACCOUNT_ID + '/' + process.env.TEST_APPLICATION_ID)
+        .set('X-API-KEY', process.env.BUGS_KEY)
+        .set('X-API-SECRET', process.env.BUGS_SECRET)
         .end((err, res) => {
           if (err) {
             BugFixes.error(err)
@@ -80,37 +124,38 @@ describe('EndPoints', () => {
 
           res.should.have.status(200)
           res.body.should.be.an('array')
-          res.body.length.should.be.eql(0)
 
           done()
         })
     })
 
     it('it should get single bug', (done) => {
+      let insertDate = new Date()
+      insertDate = insertDate.toISOString()
+
       const Data = new DataLayer()
       Data.accountId = process.env.TEST_ACCOUNT_ID
       Data.logLevel = BugFixes.LOG
-      Data.payLoad = 'Test Data'
+      Data.payLoad = 'Test Data-' + insertDate
       Data.applicationId = process.env.TEST_APPLICATION_ID
-      Data.insert((err, dataId) => {
+      Data.insert((err, returnId) => {
         if (err) {
-          return done(Error(err))
+          BugFixes.error(err)
         }
 
         chai.request(server)
-          .get('/v1/bug/' + dataId)
+          .get('/v1/bug/' + returnId)
           .end((err, res) => {
             if (err) {
               BugFixes.error(err)
 
-              return done(Error(err))
+              done(Error(err))
             }
 
             res.should.have.status(200)
-            // res.body.should.be.an('object')
-            // res.body.length.should.be.at.least(1)
+            res.body.should.be.an('object')
 
-            return done()
+            done()
           })
       })
     })

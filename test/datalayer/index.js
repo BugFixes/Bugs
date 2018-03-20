@@ -1,7 +1,8 @@
 /* global describe, it, afterEach */
 'use strict'
 
-const DataLayer = require('../src/models/datalayer')
+require('dotenv').config()
+const DataLayer = require('../../src/models/datalayer')
 
 describe('DataLayer', () => {
   afterEach((done) => {

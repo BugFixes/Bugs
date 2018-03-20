@@ -7,8 +7,8 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const should = chai.should() // eslint-disable-line
 
-const server = require('../index')
-const DataLayer = require('../src/models/datalayer')
+const server = require('../../index')
+const DataLayer = require('../../src/models/datalayer')
 
 chai.use(chaiHttp)
 
@@ -71,7 +71,7 @@ describe('EndPoints', () => {
       }
 
       chai.request(server)
-        .post('/v1/bug')
+        .post('/bug')
         .set('X-API-KEY', process.env.BUGS_KEY)
         .set('X-API-SECRET', process.env.BUGS_SECRET)
         .send(payLoad)
@@ -91,7 +91,7 @@ describe('EndPoints', () => {
   describe('/GET bug', () => {
     it('it should return all bugs for account', (done) => {
       chai.request(server)
-        .get('/v1/bugs/' + process.env.TEST_ACCOUNT_ID)
+        .get('/bugs/' + process.env.TEST_ACCOUNT_ID)
         .set('X-API-KEY', process.env.BUGS_KEY)
         .set('X-API-SECRET', process.env.BUGS_SECRET)
         .end((err, res) => {
@@ -100,8 +100,6 @@ describe('EndPoints', () => {
 
             done(Error(err))
           }
-
-          BugFixes.info(res.body)
 
           res.should.have.status(200)
           res.body.should.be.an('array')
@@ -112,7 +110,7 @@ describe('EndPoints', () => {
 
     it('it should return all bugs for an application', (done) => {
       chai.request(server)
-        .get('/v1/bugs/' + process.env.TEST_ACCOUNT_ID + '/' + process.env.TEST_APPLICATION_ID)
+        .get('/bugs/' + process.env.TEST_ACCOUNT_ID + '/' + process.env.TEST_APPLICATION_ID)
         .set('X-API-KEY', process.env.BUGS_KEY)
         .set('X-API-SECRET', process.env.BUGS_SECRET)
         .end((err, res) => {
@@ -144,7 +142,7 @@ describe('EndPoints', () => {
         }
 
         chai.request(server)
-          .get('/v1/bug/' + returnId)
+          .get('/bug/' + returnId)
           .end((err, res) => {
             if (err) {
               BugFixes.error(err)

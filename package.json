@@ -9,8 +9,10 @@
   "scripts": {
     "start": "node index.js",
     "test": "yarn standardTest && yarn mochaTest",
-    "standardTest": "standard ./**/*.js",
-    "mochaTest": "mocha test/**/*.js --exit",
+    "standardTest": "standard *.js --recursive",
+    "mochaTest": "yarn mochaDatalayer && yarn mochaEndpoints",
+    "mochaEndpoints": "mocha test/endpoints --recursive --exit",
+    "mochaDatalayer": "mocha test/datalayer --recursive --exit",
     "docker": "yarn test && yarn start"
   },
   "dependencies": {
